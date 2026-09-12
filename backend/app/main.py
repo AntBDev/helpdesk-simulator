@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+from sqlalchemy import text
+
+from app.db.session import engine
+
 
 app = FastAPI(
     title="Help Desk Simulator API",
@@ -10,12 +14,23 @@ app = FastAPI(
 def root():
     return {
         "application": "Help Desk Simulator",
-        "status": "running"
+        "status": "running",
     }
 
 
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
+    }
+
+
+@app.get("/health/database")
+def database_health_check():
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
+
+    return {
+        "database": "connected",
+        "status": "healthy",
     }
