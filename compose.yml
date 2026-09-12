@@ -1,0 +1,24 @@
+services:
+  database:
+    image: pgvector/pgvector:pg18
+    container_name: helpdesk-database
+
+    environment:
+      POSTGRES_DB: helpdesk_simulator
+      POSTGRES_USER: helpdesk
+      POSTGRES_PASSWORD: helpdesk_dev_password
+
+    ports:
+      - "127.0.0.1:5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helpdesk -d helpdesk_simulator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
