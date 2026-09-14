@@ -18,23 +18,16 @@ SLA_HOURS = {
 def get_tickets(
     db: Session,
 ) -> list[Ticket]:
-    statement = (
-        select(Ticket)
-        .order_by(Ticket.created_at.desc())
-    )
+    statement = select(Ticket).order_by(Ticket.created_at.desc())
 
-    return list(
-        db.scalars(statement).all()
-    )
+    return list(db.scalars(statement).all())
 
 
 def get_ticket_by_number(
     db: Session,
     ticket_number: str,
 ) -> Ticket | None:
-    statement = select(Ticket).where(
-        Ticket.ticket_number == ticket_number.upper()
-    )
+    statement = select(Ticket).where(Ticket.ticket_number == ticket_number.upper())
 
     return db.scalar(statement)
 
@@ -49,24 +42,16 @@ def get_ticket_events(
         .order_by(TicketEvent.created_at)
     )
 
-    return list(
-        db.scalars(statement).all()
-    )
+    return list(db.scalars(statement).all())
 
 
 def generate_ticket_number(
     db: Session,
 ) -> str:
-    sequence_value = db.scalar(
-        text(
-            "SELECT nextval('ticket_number_seq')"
-        )
-    )
+    sequence_value = db.scalar(text("SELECT nextval('ticket_number_seq')"))
 
     if sequence_value is None:
-        raise RuntimeError(
-            "Unable to generate ticket number"
-        )
+        raise RuntimeError("Unable to generate ticket number")
 
     return f"INC-{sequence_value:06d}"
 
@@ -76,9 +61,7 @@ def calculate_sla_deadline(
 ) -> datetime:
     current_time = datetime.now(UTC)
 
-    return current_time + timedelta(
-        hours=SLA_HOURS[priority]
-    )
+    return current_time + timedelta(hours=SLA_HOURS[priority])
 
 
 def create_ticket(
@@ -87,9 +70,7 @@ def create_ticket(
 ) -> Ticket:
     ticket_number = generate_ticket_number(db)
 
-    sla_deadline = calculate_sla_deadline(
-        ticket_data.priority
-    )
+    sla_deadline = calculate_sla_deadline(ticket_data.priority)
 
     ticket = Ticket(
         ticket_number=ticket_number,
@@ -123,9 +104,7 @@ def create_ticket(
                 "customer_id": ticket.customer_id,
                 "device_id": ticket.device_id,
                 "sla_deadline": (
-                    ticket.sla_deadline.isoformat()
-                    if ticket.sla_deadline
-                    else None
+                    ticket.sla_deadline.isoformat() if ticket.sla_deadline else None
                 ),
             },
         )

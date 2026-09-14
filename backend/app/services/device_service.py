@@ -22,9 +22,7 @@ def get_device_by_asset_tag(
     db: Session,
     asset_tag: str,
 ) -> Device | None:
-    statement = select(Device).where(
-        Device.asset_tag == asset_tag
-    )
+    statement = select(Device).where(Device.asset_tag == asset_tag)
 
     return db.scalar(statement)
 
@@ -33,9 +31,7 @@ def get_device_by_hostname(
     db: Session,
     hostname: str,
 ) -> Device | None:
-    statement = select(Device).where(
-        Device.hostname == hostname
-    )
+    statement = select(Device).where(Device.hostname == hostname)
 
     return db.scalar(statement)
 
@@ -44,9 +40,7 @@ def create_device(
     db: Session,
     device_data: DeviceCreate,
 ) -> Device:
-    device = Device(
-        **device_data.model_dump()
-    )
+    device = Device(**device_data.model_dump())
 
     db.add(device)
     db.commit()

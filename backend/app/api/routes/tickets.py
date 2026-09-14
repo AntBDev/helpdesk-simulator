@@ -76,10 +76,7 @@ def add_ticket(
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=(
-                    "The selected device is assigned "
-                    "to a different customer"
-                ),
+                detail=("The selected device is assigned to a different customer"),
             )
 
     return create_ticket(

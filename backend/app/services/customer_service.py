@@ -22,9 +22,7 @@ def get_customer_by_email(
     db: Session,
     email: str,
 ) -> Customer | None:
-    statement = select(Customer).where(
-        Customer.email == email
-    )
+    statement = select(Customer).where(Customer.email == email)
 
     return db.scalar(statement)
 
@@ -33,9 +31,7 @@ def create_customer(
     db: Session,
     customer_data: CustomerCreate,
 ) -> Customer:
-    customer = Customer(
-        **customer_data.model_dump()
-    )
+    customer = Customer(**customer_data.model_dump())
 
     db.add(customer)
     db.commit()
