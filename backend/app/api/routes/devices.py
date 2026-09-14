@@ -14,7 +14,6 @@ from app.services.device_service import (
     get_devices,
 )
 
-
 router = APIRouter(
     prefix="/devices",
     tags=["Devices"],

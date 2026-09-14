@@ -99,10 +99,10 @@ class Customer(Base):
         nullable=False,
     )
 
-    devices: Mapped[list["Device"]] = relationship(
+    devices: Mapped[list[Device]] = relationship(
         back_populates="customer",
     )
 
-    tickets: Mapped[list["Ticket"]] = relationship(
+    tickets: Mapped[list[Ticket]] = relationship(
         back_populates="customer",
     )

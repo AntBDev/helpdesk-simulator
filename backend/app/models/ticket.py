@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DateTime,
-    Enum as SAEnum,
     ForeignKey,
     Index,
     String,
     Text,
     func,
+)
+from sqlalchemy import (
+    Enum as SAEnum,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -120,15 +122,15 @@ class Ticket(Base):
         nullable=False,
     )
 
-    customer: Mapped["Customer"] = relationship(
+    customer: Mapped[Customer] = relationship(
         back_populates="tickets",
     )
 
-    device: Mapped["Device | None"] = relationship(
+    device: Mapped[Device | None] = relationship(
         back_populates="tickets",
     )
 
-    events: Mapped[list["TicketEvent"]] = relationship(
+    events: Mapped[list[TicketEvent]] = relationship(
         back_populates="ticket",
         cascade="all, delete-orphan",
     )

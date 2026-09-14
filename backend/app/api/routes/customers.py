@@ -12,7 +12,6 @@ from app.services.customer_service import (
     get_customers,
 )
 
-
 router = APIRouter(
     prefix="/customers",
     tags=["Customers"],

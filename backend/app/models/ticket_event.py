@@ -55,6 +55,6 @@ class TicketEvent(Base):
         nullable=False,
     )
 
-    ticket: Mapped["Ticket"] = relationship(
+    ticket: Mapped[Ticket] = relationship(
         back_populates="events",
     )
