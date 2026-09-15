@@ -14,6 +14,46 @@ SLA_HOURS = {
     TicketPriority.LOW: 24,
 }
 
+ALLOWED_STATUS_TRANSITIONS = {
+    TicketStatus.NEW: {
+        TicketStatus.ASSIGNED,
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.ESCALATED,
+    },
+    TicketStatus.ASSIGNED: {
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.ESCALATED,
+    },
+    TicketStatus.IN_PROGRESS: {
+        TicketStatus.WAITING_ON_USER,
+        TicketStatus.WAITING_ON_VENDOR,
+        TicketStatus.ESCALATED,
+        TicketStatus.RESOLVED,
+    },
+    TicketStatus.WAITING_ON_USER: {
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.ESCALATED,
+        TicketStatus.RESOLVED,
+    },
+    TicketStatus.WAITING_ON_VENDOR: {
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.ESCALATED,
+        TicketStatus.RESOLVED,
+    },
+    TicketStatus.ESCALATED: {
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.WAITING_ON_USER,
+        TicketStatus.WAITING_ON_VENDOR,
+        TicketStatus.RESOLVED,
+    },
+    TicketStatus.RESOLVED: {
+        TicketStatus.CLOSED,
+        TicketStatus.IN_PROGRESS,
+    },
+    TicketStatus.CLOSED: {
+        TicketStatus.IN_PROGRESS,
+    },
+}
 
 def get_tickets(
     db: Session,
@@ -111,6 +151,66 @@ def create_ticket(
 
         db.add(event)
 
+        db.commit()
+        db.refresh(ticket)
+
+        return ticket
+
+    except Exception:
+        db.rollback()
+        raise
+
+def update_ticket_status(
+    db: Session,
+    ticket: Ticket,
+    new_status: TicketStatus,
+) -> Ticket:
+    old_status = ticket.status
+
+    if new_status == old_status:
+        return ticket
+
+    allowed_statuses = ALLOWED_STATUS_TRANSITIONS[
+        old_status
+    ]
+
+    if new_status not in allowed_statuses:
+        raise ValueError(
+            f"Cannot transition ticket from "
+            f"{old_status.value} to {new_status.value}"
+        )
+
+    ticket.status = new_status
+
+    if new_status in {
+        TicketStatus.RESOLVED,
+        TicketStatus.CLOSED,
+    }:
+        if ticket.resolved_at is None:
+            ticket.resolved_at = datetime.now(UTC)
+
+    elif old_status in {
+        TicketStatus.RESOLVED,
+        TicketStatus.CLOSED,
+    }:
+        ticket.resolved_at = None
+
+    event = TicketEvent(
+        ticket_id=ticket.id,
+        event_type="STATUS_CHANGED",
+        actor="TECHNICIAN",
+        details=(
+            f"Ticket status changed from "
+            f"{old_status.value} to {new_status.value}."
+        ),
+        event_data={
+            "old_status": old_status.value,
+            "new_status": new_status.value,
+        },
+    )
+
+    try:
+        db.add(event)
         db.commit()
         db.refresh(ticket)
 

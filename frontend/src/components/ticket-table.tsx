@@ -4,6 +4,7 @@ import type {
   TicketPriority,
 } from "@/types";
 
+import Link from "next/link";
 
 interface TicketTableProps {
   tickets: Ticket[];
@@ -120,13 +121,16 @@ export function TicketTable({
                 </td>
 
                 <td className="px-5 py-4">
-                  <p className="font-medium text-slate-900">
+                  <Link
+                    href={`/tickets/${ticket.ticket_number}`}
+                    className="font-medium text-slate-900 hover:text-blue-700 hover:underline"
+                >
                     {ticket.ticket_number}
-                  </p>
+                </Link>
 
-                  <p className="mt-1 max-w-xs truncate text-slate-500">
+                <p className="mt-1 max-w-xs truncate text-slate-500">
                     {ticket.title}
-                  </p>
+                    </p>
                 </td>
 
                 <td className="px-5 py-4 text-slate-700">

@@ -67,5 +67,15 @@ export interface Device {
   operating_system: string;
   os_version: string | null;
   ip_address: string | null;
+  created_at: string; 
+}
+
+export interface TicketEvent {
+  id: number;
+  ticket_id: number;
+  event_type: string;
+  actor: string;
+  details: string | null;
+  event_data: Record<string, unknown>;
   created_at: string;
 }

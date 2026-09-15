@@ -8,6 +8,7 @@ from app.schemas.ticket import (
     TicketCreate,
     TicketEventRead,
     TicketRead,
+    TicketStatusUpdate,
 )
 from app.services.customer_service import get_customer_by_id
 from app.services.device_service import get_device_by_id
@@ -16,6 +17,7 @@ from app.services.ticket_service import (
     get_ticket_by_number,
     get_ticket_events,
     get_tickets,
+    update_ticket_status,
 )
 
 router = APIRouter(
@@ -132,3 +134,36 @@ def retrieve_ticket_events(
         db,
         ticket.id,
     )
+
+@router.patch(
+    "/{ticket_number}/status",
+    response_model=TicketRead,
+)
+def change_ticket_status(
+    ticket_number: str,
+    status_data: TicketStatusUpdate,
+    db: DbSession,
+) -> TicketRead:
+    ticket = get_ticket_by_number(
+        db,
+        ticket_number,
+    )
+
+    if ticket is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket not found",
+        )
+
+    try:
+        return update_ticket_status(
+            db,
+            ticket,
+            status_data.status,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
