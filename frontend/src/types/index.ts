@@ -79,3 +79,30 @@ export interface TicketEvent {
   event_data: Record<string, unknown>;
   created_at: string;
 }
+
+export interface UserAccount {
+  id: number;
+  customer_id: number;
+  username: string;
+
+  is_enabled: boolean;
+  is_locked: boolean;
+  failed_login_attempts: number;
+
+  mfa_enrolled: boolean;
+  password_reset_required: boolean;
+  password_version: number;
+
+  last_password_reset_at: string | null;
+
+  created_at: string;
+  updated_at: string;
+}
+
+
+export interface AccountToolResult {
+  action: string;
+  changed: boolean;
+  message: string;
+  account: UserAccount;
+}

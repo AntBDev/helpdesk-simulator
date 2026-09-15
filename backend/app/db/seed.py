@@ -8,9 +8,14 @@ from app.models.enums import (
     TicketPriority,
 )
 from app.models.ticket import Ticket
+from app.schemas.account import AccountCreate
 from app.schemas.customer import CustomerCreate
 from app.schemas.device import DeviceCreate
 from app.schemas.ticket import TicketCreate
+from app.services.account_service import (
+    create_account,
+    get_account_by_customer_id,
+)
 from app.services.customer_service import (
     create_customer,
     get_customer_by_email,
@@ -142,6 +147,79 @@ CUSTOMERS = [
         "cooperation": 7,
         "confidence": 7,
         "communication_clarity": 4,
+    },
+]
+
+ACCOUNTS = [
+    {
+        "customer_email": "jessica.turner@example.com",
+        "username": "jturner",
+        "is_locked": False,
+        "failed_login_attempts": 1,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "marcus.reed@example.com",
+        "username": "mreed",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "olivia.bennett@example.com",
+        "username": "obennett",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "ethan.cole@example.com",
+        "username": "ecole",
+        "is_locked": False,
+        "failed_login_attempts": 2,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "maya.brooks@example.com",
+        "username": "mbrooks",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "noah.price@example.com",
+        "username": "nprice",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "chloe.morgan@example.com",
+        "username": "cmorgan",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "derrick.hayes@example.com",
+        "username": "dhayes",
+        "is_locked": True,
+        "failed_login_attempts": 5,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "sophia.kim@example.com",
+        "username": "skim",
+        "is_locked": False,
+        "failed_login_attempts": 0,
+        "mfa_enrolled": True,
+    },
+    {
+        "customer_email": "andre.miller@example.com",
+        "username": "amiller",
+        "is_locked": False,
+        "failed_login_attempts": 1,
+        "mfa_enrolled": True,
     },
 ]
 
@@ -505,6 +583,11 @@ def seed_database() -> None:
     with SessionLocal() as db:
         customers = seed_customers(db)
 
+        seed_accounts(
+            db,
+            customers,
+        )
+
         devices = seed_devices(
             db,
             customers,
@@ -517,6 +600,40 @@ def seed_database() -> None:
         )
 
     print("Development database seed complete.")
+
+
+def seed_accounts(
+    db: Session,
+    customers: dict[str, object],
+) -> None:
+    created = 0
+
+    for account_data in ACCOUNTS:
+        customer = customers[account_data["customer_email"]]
+
+        existing = get_account_by_customer_id(
+            db,
+            customer.id,
+        )
+
+        if existing is not None:
+            continue
+
+        create_account(
+            db,
+            AccountCreate(
+                customer_id=customer.id,
+                username=account_data["username"],
+                is_enabled=True,
+                is_locked=account_data["is_locked"],
+                failed_login_attempts=(account_data["failed_login_attempts"]),
+                mfa_enrolled=account_data["mfa_enrolled"],
+            ),
+        )
+
+        created += 1
+
+    print(f"Accounts created: {created}")
 
 
 if __name__ == "__main__":

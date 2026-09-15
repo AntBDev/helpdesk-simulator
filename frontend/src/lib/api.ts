@@ -4,6 +4,7 @@ import type {
   Ticket,
   TicketEvent,
   TicketStatus,
+  AccountToolResult,
 } from "@/types";
 
 
@@ -105,6 +106,53 @@ export function updateTicketStatus(
       body: JSON.stringify({
         status,
       }),
+    },
+  );
+}
+
+export function lookupAccount(
+  ticketNumber: string,
+): Promise<AccountToolResult> {
+  return apiRequest<AccountToolResult>(
+    `/tickets/${ticketNumber}/tools/account/lookup`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function unlockAccount(
+  ticketNumber: string,
+): Promise<AccountToolResult> {
+  return apiRequest<AccountToolResult>(
+    `/tickets/${ticketNumber}/tools/account/unlock`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function resetAccountPassword(
+  ticketNumber: string,
+): Promise<AccountToolResult> {
+  return apiRequest<AccountToolResult>(
+    `/tickets/${ticketNumber}/tools/account/password-reset`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function resetAccountMfa(
+  ticketNumber: string,
+): Promise<AccountToolResult> {
+  return apiRequest<AccountToolResult>(
+    `/tickets/${ticketNumber}/tools/account/mfa-reset`,
+    {
+      method: "POST",
     },
   );
 }

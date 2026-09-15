@@ -7,6 +7,7 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { AccountTools } from "@/components/account-tools";
 import { Sidebar } from "@/components/sidebar";
 import { TicketStatusControls } from "@/components/ticket-status-controls";
 import {
@@ -160,6 +161,10 @@ export default async function TicketPage(
                 </p>
               </section>
 
+              <AccountTools
+                ticketNumber={ticket.ticket_number}
+              />
+              
               <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
                 <div className="border-b border-slate-200 px-6 py-4">
                   <h2 className="font-semibold text-slate-950">

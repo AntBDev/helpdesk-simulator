@@ -7,6 +7,7 @@ from sqlalchemy import CheckConstraint, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.user_account import UserAccount
 
 if TYPE_CHECKING:
     from app.models.device import Device
@@ -105,4 +106,10 @@ class Customer(Base):
 
     tickets: Mapped[list[Ticket]] = relationship(
         back_populates="customer",
+    )
+
+    account: Mapped[UserAccount | None] = relationship(
+        back_populates="customer",
+        cascade="all, delete-orphan",
+        uselist=False,
     )

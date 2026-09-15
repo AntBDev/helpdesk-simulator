@@ -135,6 +135,7 @@ def retrieve_ticket_events(
         ticket.id,
     )
 
+
 @router.patch(
     "/{ticket_number}/status",
     response_model=TicketRead,

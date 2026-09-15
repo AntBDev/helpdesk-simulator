@@ -55,6 +55,7 @@ ALLOWED_STATUS_TRANSITIONS = {
     },
 }
 
+
 def get_tickets(
     db: Session,
 ) -> list[Ticket]:
@@ -160,6 +161,7 @@ def create_ticket(
         db.rollback()
         raise
 
+
 def update_ticket_status(
     db: Session,
     ticket: Ticket,
@@ -170,14 +172,11 @@ def update_ticket_status(
     if new_status == old_status:
         return ticket
 
-    allowed_statuses = ALLOWED_STATUS_TRANSITIONS[
-        old_status
-    ]
+    allowed_statuses = ALLOWED_STATUS_TRANSITIONS[old_status]
 
     if new_status not in allowed_statuses:
         raise ValueError(
-            f"Cannot transition ticket from "
-            f"{old_status.value} to {new_status.value}"
+            f"Cannot transition ticket from {old_status.value} to {new_status.value}"
         )
 
     ticket.status = new_status
@@ -200,8 +199,7 @@ def update_ticket_status(
         event_type="STATUS_CHANGED",
         actor="TECHNICIAN",
         details=(
-            f"Ticket status changed from "
-            f"{old_status.value} to {new_status.value}."
+            f"Ticket status changed from {old_status.value} to {new_status.value}."
         ),
         event_data={
             "old_status": old_status.value,

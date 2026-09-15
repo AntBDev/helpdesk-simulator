@@ -29,9 +29,11 @@ class TicketCreate(BaseModel):
     customer_id: int
     device_id: int | None = None
 
+
 class TicketStatusUpdate(BaseModel):
     status: TicketStatus
-    
+
+
 class TicketRead(BaseModel):
     id: int
     ticket_number: str
