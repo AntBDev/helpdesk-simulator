@@ -7,6 +7,7 @@ from app.models.user_account import UserAccount
 __all__ = [
     "Customer",
     "Device",
+    "DeviceState",
     "Ticket",
     "TicketEvent",
     "UserAccount",

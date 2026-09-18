@@ -7,6 +7,7 @@ from app.models.ticket import Ticket
 from app.models.ticket_event import TicketEvent
 from app.models.user_account import UserAccount
 from app.schemas.account import AccountCreate
+from app.services.tool_event_service import record_tool_action
 
 
 def get_account_by_customer_id(
@@ -48,6 +49,7 @@ def account_snapshot(
 def record_tool_action(
     db: Session,
     ticket: Ticket,
+    tool="ACCOUNT_ADMIN",
     *,
     action: str,
     changed: bool,
@@ -85,6 +87,7 @@ def lookup_account(
         record_tool_action(
             db,
             ticket,
+            tool="ACCOUNT_ADMIN",
             action="LOOKUP",
             changed=False,
             before=state,
@@ -106,6 +109,7 @@ def unlock_account(
     db: Session,
     ticket: Ticket,
     account: UserAccount,
+    tool="ACCOUNT_ADMIN",
 ) -> tuple[UserAccount, bool, str]:
     before = account_snapshot(account)
 
@@ -125,6 +129,7 @@ def unlock_account(
         record_tool_action(
             db,
             ticket,
+            tool="ACCOUNT_ADMIN",
             action="UNLOCK",
             changed=changed,
             before=before,
@@ -146,6 +151,7 @@ def reset_password(
     db: Session,
     ticket: Ticket,
     account: UserAccount,
+    tool="ACCOUNT_ADMIN",
 ) -> tuple[UserAccount, bool, str]:
     before = account_snapshot(account)
 
@@ -162,6 +168,7 @@ def reset_password(
         record_tool_action(
             db,
             ticket,
+            tool="ACCOUNT_ADMIN",
             action="PASSWORD_RESET",
             changed=True,
             before=before,
@@ -201,6 +208,7 @@ def reset_mfa(
         record_tool_action(
             db,
             ticket,
+            tool="ACCOUNT_ADMIN",
             action="MFA_RESET",
             changed=changed,
             before=before,

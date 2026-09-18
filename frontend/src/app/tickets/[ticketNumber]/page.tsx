@@ -16,6 +16,7 @@ import {
   getTicket,
   getTicketEvents,
 } from "@/lib/api";
+import { DeviceTools } from "@/components/device-tools";
 
 
 function formatDate(
@@ -164,6 +165,11 @@ export default async function TicketPage(
               <AccountTools
                 ticketNumber={ticket.ticket_number}
               />
+              {device && (
+                <DeviceTools
+                  ticketNumber={ticket.ticket_number}
+                />
+              )}
               
               <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
                 <div className="border-b border-slate-200 px-6 py-4">

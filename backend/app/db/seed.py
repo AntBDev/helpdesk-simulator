@@ -11,6 +11,7 @@ from app.models.ticket import Ticket
 from app.schemas.account import AccountCreate
 from app.schemas.customer import CustomerCreate
 from app.schemas.device import DeviceCreate
+from app.schemas.device_state import DeviceStateCreate
 from app.schemas.ticket import TicketCreate
 from app.services.account_service import (
     create_account,
@@ -19,6 +20,10 @@ from app.services.account_service import (
 from app.services.customer_service import (
     create_customer,
     get_customer_by_email,
+)
+from app.services.device_diagnostic_service import (
+    create_device_state,
+    get_device_state_by_device_id,
 )
 from app.services.device_service import (
     create_device,
@@ -447,6 +452,139 @@ TICKETS = [
     },
 ]
 
+DEVICE_STATES = {
+    "ACC-LT-017": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 221,
+        "cpu_usage_percent": 18,
+        "memory_usage_percent": 42,
+        "pending_reboot": False,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "FIN-LT-021": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": False,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 184,
+        "cpu_usage_percent": 14,
+        "memory_usage_percent": 48,
+        "pending_reboot": False,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "HR-LT-028": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 256,
+        "disk_free_gb": 61,
+        "cpu_usage_percent": 27,
+        "memory_usage_percent": 63,
+        "pending_reboot": True,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "SALES-LT-034": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 298,
+        "cpu_usage_percent": 12,
+        "memory_usage_percent": 39,
+        "pending_reboot": False,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "ENG-LT-041": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": False,
+        "internet_reachable": True,
+        "disk_total_gb": 1024,
+        "disk_free_gb": 341,
+        "cpu_usage_percent": 21,
+        "memory_usage_percent": 56,
+        "pending_reboot": False,
+        "primary_service_name": "NetworkManager",
+        "primary_service_running": True,
+    },
+    "OPS-DT-052": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 174,
+        "cpu_usage_percent": 24,
+        "memory_usage_percent": 51,
+        "pending_reboot": False,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "MKT-LT-061": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 107,
+        "cpu_usage_percent": 16,
+        "memory_usage_percent": 52,
+        "pending_reboot": False,
+        "primary_service_name": "mDNSResponder",
+        "primary_service_running": True,
+    },
+    "SALES-LT-072": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 512,
+        "disk_free_gb": 256,
+        "cpu_usage_percent": 19,
+        "memory_usage_percent": 44,
+        "pending_reboot": False,
+        "primary_service_name": "Workstation Service",
+        "primary_service_running": True,
+    },
+    "HQ-PRN-01": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": False,
+        "dns_resolving": True,
+        "internet_reachable": False,
+        "disk_total_gb": 32,
+        "disk_free_gb": 21,
+        "cpu_usage_percent": 8,
+        "memory_usage_percent": 31,
+        "pending_reboot": False,
+        "primary_service_name": "Print Service",
+        "primary_service_running": True,
+    },
+    "HQ-PRN-02": {
+        "network_adapter_enabled": True,
+        "gateway_reachable": True,
+        "dns_resolving": True,
+        "internet_reachable": True,
+        "disk_total_gb": 32,
+        "disk_free_gb": 24,
+        "cpu_usage_percent": 6,
+        "memory_usage_percent": 27,
+        "pending_reboot": False,
+        "primary_service_name": "Print Service",
+        "primary_service_running": True,
+    },
+}
+
 
 def seed_customers(
     db: Session,
@@ -593,6 +731,11 @@ def seed_database() -> None:
             customers,
         )
 
+        seed_device_states(
+            db,
+            devices,
+        )
+
         seed_tickets(
             db,
             customers,
@@ -634,6 +777,36 @@ def seed_accounts(
         created += 1
 
     print(f"Accounts created: {created}")
+
+
+def seed_device_states(
+    db: Session,
+    devices: dict[str, object],
+) -> None:
+    created = 0
+
+    for hostname, state_data in DEVICE_STATES.items():
+        device = devices[hostname]
+
+        existing = get_device_state_by_device_id(
+            db,
+            device.id,
+        )
+
+        if existing is not None:
+            continue
+
+        create_device_state(
+            db,
+            DeviceStateCreate(
+                device_id=device.id,
+                **state_data,
+            ),
+        )
+
+        created += 1
+
+    print(f"Device states created: {created}")
 
 
 if __name__ == "__main__":

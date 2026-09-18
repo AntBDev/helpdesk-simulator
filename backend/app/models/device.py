@@ -8,6 +8,7 @@ from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.device_state import DeviceState
 from app.models.enums import DeviceStatus, DeviceType
 
 if TYPE_CHECKING:
@@ -97,3 +98,10 @@ class Device(Base):
     tickets: Mapped[list[Ticket]] = relationship(
         back_populates="device",
     )
+
+
+simulated_state: Mapped[DeviceState | None] = relationship(
+    back_populates="device",
+    cascade="all, delete-orphan",
+    uselist=False,
+)

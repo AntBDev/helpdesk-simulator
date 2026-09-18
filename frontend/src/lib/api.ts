@@ -5,6 +5,7 @@ import type {
   TicketEvent,
   TicketStatus,
   AccountToolResult,
+  DeviceToolResult,
 } from "@/types";
 
 
@@ -151,6 +152,89 @@ export function resetAccountMfa(
 ): Promise<AccountToolResult> {
   return apiRequest<AccountToolResult>(
     `/tickets/${ticketNumber}/tools/account/mfa-reset`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+export function inspectDevice(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/inspect`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function testDeviceConnectivity(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/connectivity-test`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function testDeviceDns(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/dns-test`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function checkDeviceResources(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/resource-check`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function enableDeviceNetworkAdapter(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/enable-network-adapter`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function restartDeviceService(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/restart-service`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export function rebootDevice(
+  ticketNumber: string,
+): Promise<DeviceToolResult> {
+  return apiRequest<DeviceToolResult>(
+    `/tickets/${ticketNumber}/tools/device/reboot`,
     {
       method: "POST",
     },

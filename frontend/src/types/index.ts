@@ -106,3 +106,35 @@ export interface AccountToolResult {
   message: string;
   account: UserAccount;
 }
+
+export interface DeviceState {
+  id: number;
+  device_id: number;
+
+  network_adapter_enabled: boolean;
+  gateway_reachable: boolean;
+  dns_resolving: boolean;
+  internet_reachable: boolean;
+
+  disk_total_gb: number;
+  disk_free_gb: number;
+
+  cpu_usage_percent: number;
+  memory_usage_percent: number;
+
+  pending_reboot: boolean;
+
+  primary_service_name: string | null;
+  primary_service_running: boolean;
+
+  created_at: string;
+  updated_at: string;
+}
+
+
+export interface DeviceToolResult {
+  action: string;
+  changed: boolean;
+  message: string;
+  state: DeviceState;
+}
