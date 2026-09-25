@@ -4,7 +4,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.ticket import Ticket
-from app.models.ticket_event import TicketEvent
 from app.models.user_account import UserAccount
 from app.schemas.account import AccountCreate
 from app.services.tool_event_service import record_tool_action
@@ -46,34 +45,6 @@ def account_snapshot(
     }
 
 
-def record_tool_action(
-    db: Session,
-    ticket: Ticket,
-    tool="ACCOUNT_ADMIN",
-    *,
-    action: str,
-    changed: bool,
-    before: dict[str, object],
-    after: dict[str, object],
-    message: str,
-) -> None:
-    event = TicketEvent(
-        ticket_id=ticket.id,
-        event_type="TOOL_ACTION",
-        actor="TECHNICIAN",
-        details=message,
-        event_data={
-            "tool": "ACCOUNT_ADMIN",
-            "action": action,
-            "changed": changed,
-            "before": before,
-            "after": after,
-        },
-    )
-
-    db.add(event)
-
-
 def lookup_account(
     db: Session,
     ticket: Ticket,
@@ -109,7 +80,6 @@ def unlock_account(
     db: Session,
     ticket: Ticket,
     account: UserAccount,
-    tool="ACCOUNT_ADMIN",
 ) -> tuple[UserAccount, bool, str]:
     before = account_snapshot(account)
 
@@ -151,7 +121,6 @@ def reset_password(
     db: Session,
     ticket: Ticket,
     account: UserAccount,
-    tool="ACCOUNT_ADMIN",
 ) -> tuple[UserAccount, bool, str]:
     before = account_snapshot(account)
 
